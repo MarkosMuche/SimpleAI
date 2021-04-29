@@ -1,6 +1,4 @@
 
-
-
 import torch
 import torchvision
 from torchvision import datasets, transforms
@@ -49,7 +47,10 @@ def train_model(model,trainloader,classes):
         loss.backward()
         optimizer.step()
         if ii==1:
+            torch.save(model,'myModel.pth')
+            #model = torch.load('checkpoint.pth')
             break
+        
     return model
     print('hoola train is workign sof far')
 
