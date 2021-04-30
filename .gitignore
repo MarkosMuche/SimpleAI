@@ -4,3 +4,4 @@ cats_and_dogs
 __pycache__
 .vscode
 .venv
+myModel.pth

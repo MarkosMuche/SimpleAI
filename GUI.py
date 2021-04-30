@@ -9,8 +9,6 @@ def second_window():
 def gui_predict():
     sg.theme('LightGreen')
     sg.set_options(element_padding=(0,0))
-
-
 def gui_train():
     sg.theme('LightGreen')
     sg.set_options(element_padding=(0, 0))
@@ -31,14 +29,12 @@ def gui_train():
     # create another task for prediction
     layout_predict=[[sg.T('Here you can select from the models that you trained so far and predict')],
                 [sg.Listbox('list of shit')]]
-
     tabs=[[sg.TabGroup([[sg.Tab('Training tab', layout_learn,title_color='Red',border_width=20,background_color='Green',
                         element_justification='center'), sg.Tab('Predict',layout_predict)]],tab_location='centertop',title_color='Red')]]
-
     window = sg.Window("Windows-like program",
                        tabs,
                        default_element_size=(12, 1),
-                       grab_anywhere=True,
+                       grab_anywhere=False,
                        right_click_menu=right_click_menu,
                        default_button_element_size=(12, 1),
                        size=(400,400),

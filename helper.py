@@ -13,3 +13,4 @@ def imageshow(image):
     image=image.swapaxes(0,1)
     plt.imshow(image)
     plt.show()
+
