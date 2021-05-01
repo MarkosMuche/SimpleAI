@@ -6,8 +6,6 @@ from torch import nn
 from torch import optim
 import torch.nn.functional as F
 import helper
-
-
 # The following function uses a datasets.ImageFolder from torchvision to read image data from local folder and
 # torch.utils.data.Dataloader class for converting our data into an iterable of batches that is shuffled
 def prepare_data(data_dir):
@@ -15,8 +13,9 @@ def prepare_data(data_dir):
                                     transforms.CenterCrop(224),
                                     transforms.ToTensor()])
     dataset = datasets.ImageFolder(data_dir, transform=transform)
+    num_data=len(dataset)
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=True)
-    return dataloader
+    return dataloader, num_data
 
 def train_model(model,trainloader,testloader,classes):
     for param in model.parameters():
@@ -36,10 +35,10 @@ def train_model(model,trainloader,testloader,classes):
     epochs = 10
     steps = 0
     running_loss = 0
-    print_every = 1
+    print_every = 2 
     for epoch in range(epochs):     # for each epoch 
         print('epoch', epoch, 'started...')
-        running_loss, steps=forward_batch(model, trainloader,device,running_loss,steps) 
+        running_loss, steps=forward_train(model, trainloader,device,running_loss,steps) # for each batch
         print('running loss in step', steps, ' is ',running_loss)    
         if steps % print_every == 0:
             test_loss = 0
@@ -54,11 +53,14 @@ def train_model(model,trainloader,testloader,classes):
                 f"Test accuracy: {accuracy/len(testloader):.3f}")
             running_loss = 0
             model.train()
-    print('hoola train is workign sof far')
+        torch.save(model,'myModel.pth')
+        #model = torch.load('checkpoint.pth')
+
+    print('hoola your training has finished')
     return model
     
 
-def forward_batch(model, dataloader, device, running_loss, steps):
+def forward_train(model, dataloader, device, running_loss, steps):
     criterion = nn.NLLLoss()
     optimizer = optim.Adam(model.classifier.parameters(), lr=0.001)
     for inputs, labels in dataloader:  # for each batch
@@ -71,7 +73,7 @@ def forward_batch(model, dataloader, device, running_loss, steps):
         loss.backward()
         optimizer.step()    # update all the weights (back propagation)
         running_loss += loss.item()
-        print('.')
+        # print('')
     return running_loss, steps
 
 def forward_test(model, dataloader, device,test_loss, accuracy):
@@ -90,3 +92,9 @@ def forward_test(model, dataloader, device,test_loss, accuracy):
     return test_loss, accuracy
 
 
+def prepare_data_for_prediction():
+    pass
+
+
+def predict():
+    pass

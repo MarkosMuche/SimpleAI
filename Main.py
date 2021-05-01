@@ -18,14 +18,14 @@ while True:
         print('Event = ', event)
     if event== 'submit':
         DATADIR_train=values['train_folder']
-        train_images=len(DATADIR_train)
-        
         DATADIR_test=values['test_folder']
-        test_images=len(DATADIR_test)
-        print('number of training data = ', train_images)
-        print('number of testing data = ', test_images)
-        dataloader_train=MachineLearn.prepare_data(DATADIR_train)
-        dataloader_test=MachineLearn.prepare_data(DATADIR_test)
+        model_name=values['model'] 
+               
+        dataloader_train, num_data_train=MachineLearn.prepare_data(DATADIR_train)
+        dataloader_test, num_data_test=MachineLearn.prepare_data(DATADIR_test)
+        print('number of training data = ', num_data_train)
+        print('number of testing data = ', num_data_test)
+
         images,labels=next(iter(dataloader_train))
         classes=os.listdir(DATADIR_train)
         # the first thread for imshow

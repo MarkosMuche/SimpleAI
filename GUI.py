@@ -6,9 +6,6 @@ def second_window():
     window = sg.Window('Second Form', layout)
     event, values = window.read()
     window.close()
-def gui_predict():
-    sg.theme('LightGreen')
-    sg.set_options(element_padding=(0,0))
 def gui_train():
     sg.theme('LightGreen')
     sg.set_options(element_padding=(0, 0))
@@ -28,7 +25,8 @@ def gui_train():
               [sg.Output(size=(110, 30), font=('Helvetica 10'))]]
     # create another task for prediction
     layout_predict=[[sg.T('Here you can select from the models that you trained so far and predict')],
-                [sg.Listbox('list of shit')]]
+                [sg.Listbox('list of shit')],
+                sg.Text('Training folder'),sg.In(size=(25, 1), enable_events=True, key="train_folder"),sg.FolderBrowse()]]
     tabs=[[sg.TabGroup([[sg.Tab('Training tab', layout_learn,title_color='Red',border_width=20,background_color='Green',
                         element_justification='center'), sg.Tab('Predict',layout_predict)]],tab_location='centertop',title_color='Red')]]
     window = sg.Window("Windows-like program",
