@@ -1,8 +1,12 @@
 try_tabbed_window.py
 try.py
-cats_and_dogs
+try.ipynb
 __pycache__
 .vscode
 .venv
 myModel.pth
 save snippets
+models
+labels
+docs
+__pycache__
