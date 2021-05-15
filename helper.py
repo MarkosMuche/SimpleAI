@@ -16,13 +16,13 @@ from torchvision.transforms.transforms import CenterCrop
 # The images loaded by dataloader are shaped (3,224,224).
 #  However, matplotlib plots images of shape(224,224,3). t
 # his function uses torch.swapaxes() method to switch the axes to be visible by matplotlib.
-learning_rate=0.003
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def imageshow(image):
     image=image.swapaxes(0,2)
     image=image.swapaxes(0,1)
     plt.imshow(image)
+    plt.title('Sample image from the training set')
     plt.show()
 
 imsize = 224
@@ -37,7 +37,7 @@ def image_loader(image_path):
     return image.to(device)
 
 
-def initialize_model(model_name, num_classes):
+def initialize_model(model_name, num_classes,learning_rate):
     # Initialize these variables which will be set in this if statement. Each of these
     #   variables is model specific.
     model_ft = None

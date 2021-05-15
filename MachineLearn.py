@@ -37,11 +37,10 @@ def prepare_data_test(data_dir,input_size):
     return dataloader, num_images
 
 
-def train_model(optimizer, model,trainloader,testloader,model_name, window ):
+def train_model(optimizer, model,trainloader,testloader,model_name, window, epochs ):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     # Only train the classifier parameters, feature parameters are frozen
     model.to(device)
-    epochs = 10
     steps = 0
     running_loss = 0
     print_every = 1

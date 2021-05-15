@@ -13,13 +13,34 @@ import PySimpleGUI as sg
 import webbrowser
 window =GUI.make_gui()
 window.finalize()
+
+toggle=True
 # The following while loop waits until an event happens in window created above
+
 while True:
     event, values =window.read()
     if event is None or event == 'Exit':
         break   
     # #########################################################if someone presses the training button on training tab
+    if event=='Advanced settings':
+        window['learning rate'].update(visible=toggle)
+        window['lr'].update(visible=toggle)
+        window['transfer learning model'].update(visible=toggle)
+        window['transfer_models'].update(visible=toggle)
+        window['epoch'].update(visible=toggle)
+        window['ep'].update(visible=toggle)
+        window['col1'].update(visible=toggle)
+        window['col2'].update(visible=toggle)
+        window['col3'].update(visible=toggle)
+        window['col4'].update(visible=toggle)
+        window['col5'].update(visible=toggle)
+        window['col6'].update(visible=toggle)
+
     if event== 'train':
+        transfer_model=values['transfer_models']
+        learning_rate=float(values['lr'])
+        epoch=int(values['ep'])
+
         DATADIR_train=values['train_folder']
         DATADIR_test=values['test_folder']
         model_name=values['model']
@@ -29,9 +50,8 @@ while True:
         else:
             classes=os.listdir(DATADIR_train)
             num_classes=len(classes)
-            transfer_model=values['transfer_models']
             ####################################################################################################create model
-            optimizer, model, input_size=helper.initialize_model(transfer_model,num_classes )
+            optimizer, model, input_size=helper.initialize_model(transfer_model,num_classes,learning_rate )
             dataloader_train, train_num_images=MachineLearn.prepare_data_train(DATADIR_train,input_size)
             dataloader_test, test_num_images=MachineLearn.prepare_data_test(DATADIR_test,input_size)
 
@@ -51,7 +71,7 @@ while True:
             t1=threading.Thread(target=helper.imageshow,args=(images[0],))
             t1.start()
             ################################################################################################another thread
-            t2 = threading.Thread(target=MachineLearn.train_model, args=(optimizer, model,dataloader_train,dataloader_test, model_name, window), daemon=True)
+            t2 = threading.Thread(target=MachineLearn.train_model, args=(optimizer, model,dataloader_train,dataloader_test, model_name, window,epoch), daemon=True)
             t2.start()
     
     ##############################################################if someone presses the predict button on the prediction tab
