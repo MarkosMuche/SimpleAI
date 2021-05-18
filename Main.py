@@ -5,12 +5,11 @@ import MachineLearn
 import os
 import GUI
 import helper
-from torchvision import models
-import cv2
-import matplotlib.pyplot as plt
 import csv
 import PySimpleGUI as sg
 import webbrowser
+import random
+from helper import ThreadWithReturnValue
 window =GUI.make_gui()
 window.finalize()
 
@@ -35,6 +34,7 @@ while True:
         window['col4'].update(visible=toggle)
         window['col5'].update(visible=toggle)
         window['col6'].update(visible=toggle)
+        toggle= not toggle
 
     if event== 'train':
         transfer_model=values['transfer_models']
@@ -51,7 +51,11 @@ while True:
             classes=os.listdir(DATADIR_train)
             num_classes=len(classes)
             ####################################################################################################create model
-            optimizer, model, input_size=helper.initialize_model(transfer_model,num_classes,learning_rate )
+            ############################################################################### thread 1 to create the model
+            t1=ThreadWithReturnValue(target=helper.initialize_model,args=(transfer_model,num_classes,learning_rate ))
+            t1.start()
+            optimizer, model, input_size=t1.join()  
+
             dataloader_train, train_num_images=MachineLearn.prepare_data_train(DATADIR_train,input_size)
             dataloader_test, test_num_images=MachineLearn.prepare_data_test(DATADIR_test,input_size)
 
@@ -67,18 +71,40 @@ while True:
                 write=csv.writer(csv_file)
                 write.writerow(classes)
 
-            # ###################################################################################the first thread for imshow
-            t1=threading.Thread(target=helper.imageshow,args=(images[0],))
-            t1.start()
             ################################################################################################another thread
             t2 = threading.Thread(target=MachineLearn.train_model, args=(optimizer, model,dataloader_train,dataloader_test, model_name, window,epoch), daemon=True)
             t2.start()
-    
+    if event=='train_folder':
+        try:
+            DATADIR_train=values['train_folder']
+            folder=os.listdir(DATADIR_train)
+            random.shuffle(folder)
+            folder1=os.path.join(DATADIR_train,folder[0])
+            folder2=os.path.join(DATADIR_train,folder[1])
+            folder3=os.path.join(DATADIR_train,folder[2])
+            list_of_images1=os.listdir(folder1)
+            random.shuffle(list_of_images1)
+            list_of_images2=os.listdir(folder2)
+            random.shuffle(list_of_images2)
+            list_of_images3=os.listdir(folder3)
+            random.shuffle(list_of_images3)
+
+
+            path1=os.path.join(folder1,list_of_images1[1])
+            path2=os.path.join(folder2,list_of_images2[2])
+            path3=os.path.join(folder3,list_of_images3[3])
+            window['train_image1'].update(data=helper.get_img_data_tkinter(path1, first=True))
+            window['train_image2'].update(data=helper.get_img_data_tkinter(path2, first=True))
+            window['train_image3'].update(data=helper.get_img_data_tkinter(path3, first=True))
+
+        except:
+            pass
     ##############################################################if someone presses the predict button on the prediction tab
     if event=='predict':
         current_model_name= values['models_list']
-        current_image_path=values['predict_image']
-        
+        ccurrent_image_path=os.path.join(values['predict_folder'],values['images_list'][0])
+
+        window['image'].update(data=helper.get_img_data_tkinter(current_image_path, first=True))
         if (len(current_model_name)==0 or len(current_image_path)==0):
             sg.popup('you have to select a model and an image!!')
         else:
@@ -86,7 +112,10 @@ while True:
             current_model=torch.load(current_model_path)
             current_model.eval()
             current_image=helper.image_loader(current_image_path)
-            logps=current_model(current_image)        
+            ##################################################### threading for prediction
+            t3=ThreadWithReturnValue(target=current_model,args=(current_image,))
+            t3.start()
+            logps=t3.join()       
             probs=torch.exp(logps)
             top_p, top_class = probs.topk(1, dim=1)
             pred_index=top_class.item()
@@ -99,6 +128,29 @@ while True:
                     class_labels.append(row)
             class_labels=class_labels[0]
             window[GUI.predict_out].update('\n this is '+class_labels[pred_index] + ' with probability of ' + str(probability*100)+'.', text_color_for_value='green',background_color_for_value='white',append=True)
+    
+    if event=='predict_folder':
+        folder = values["predict_folder"]
+        try:
+            # Get list of files in folder
+            file_list = os.listdir(folder)
+        except:
+            file_list = []
+
+        fnames = [
+            f
+            for f in file_list
+            if os.path.isfile(os.path.join(folder, f))
+            
+        ]
+        window["images_list"].update(fnames)
+    if event=='images_list':
+        try:
+            current_image_path=os.path.join(values['predict_folder'],values['images_list'][0])
+            window['image'].update(data=helper.get_img_data_tkinter(current_image_path, first=True))
+
+        except:
+            pass
     if event=='About...':
         sg.popup('Simple AI is a startup that develops an application for desktop. The application makes use of already available machine learning libraries like tensorflow and pytorch to make machine learning easy. AI is a field that is very applicable in the current world. However, making an implementable AI app takes an expert to go into the field and program it. This application makes it easy to implement any kind of AI algorithm easily. Using the app any person can train machine learning models easily without a deep knowledge of the field and no knowledge of programming. It is a very important app to implement AI solutions for companies. The application is on development stage and it will be released for trial soon.')
 
