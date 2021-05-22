@@ -26,9 +26,9 @@ def make_gui():
     # create one tab for learning task
     layout_learn_1=[
                     [sg.Text('Sample Images from the training folder')],
-                    [sg.Image(key='train_image1')],
-                    [sg.Image(key='train_image2')],
-                    [sg.Image(key='train_image3')]
+                    [sg.Image(key='train_image1',data=helper.get_img_data_tkinter('logos\SAI_logo1.jpg', first=True))],
+                    [sg.Image(key='train_image2',data=helper.get_img_data_tkinter('logos\SAI_logo2.png', first=True))],
+                    [sg.Image(key='train_image3',data=helper.get_img_data_tkinter('logos\SAI_logo1.jpg', first=True))]
     ]
     layout_learn_2 = [ menu,
                     [sg.Button('Advanced settings')],
@@ -44,7 +44,6 @@ def make_gui():
                     [sg.Text('Testing folder'),sg.In(size=(25, 1), enable_events=True, key="test_folder"), sg.FolderBrowse()],
                     [sg.Button('Start training',key='train',bind_return_key=True)],
                     [sg.Multiline(size=(250,24), key=train_out)]
-                    #[sg.Output(size=(250,1))]
                    ]
 
     layout_learn=[[
@@ -61,9 +60,10 @@ def make_gui():
 
     layout_predict_2=[[sg.T('Select from the models that you trained and predict', pad=(5,30), font='Courier')],
                     [sg.T('Choose your model'),sg.Combo(models_list,key='models_list',size=(10,1))],
+                    [sg.Text("Choose a file to predict: "), sg.Input(size=(25,1),tooltip='select image'), sg.FileBrowse(key='predict_image')],
                     [sg.Button('Predict', key='predict',bind_return_key=True)],
                     [sg.Image(key='image',size=(80,70))],
-                    [sg.Multiline(size=(200,20), key=predict_out)],
+                    [sg.Multiline(size=(200,40), key=predict_out)]
                    ]
 
     layout_predict=[[

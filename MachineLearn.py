@@ -47,12 +47,14 @@ def train_model(optimizer, model,trainloader,testloader,model_name, window, epoc
     for epoch in range(epochs):     # for each epoch 
         window[GUI.train_out].update('\nepoch '+str(epoch+1) + ' started...',append=True)
         running_loss, steps=forward_batch(optimizer, window, model, trainloader,device,running_loss,steps) 
+        running_loss,steps=round(running_loss,4),round(steps,4)
         if steps % print_every == 0:
             test_loss = 0
             accuracy = 0
             model.eval() #turn to evaluation mode by making the dropouts to 0
             with torch.no_grad():
                 test_loss, accuracy = forward_test(model, testloader, device,test_loss, accuracy)
+                test_loss, accuracy=round(test_loss,4),round(accuracy,4)
                     
             window[GUI.train_out].update('\nEpoch' + str(epoch+1)+'/'+str(epochs)+'..'+
                 'Train loss: '+str(running_loss/print_every)+'.. '+

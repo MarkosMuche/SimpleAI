@@ -102,6 +102,62 @@ while True:
     ##############################################################if someone presses the predict button on the prediction tab
     if event=='predict':
         current_model_name= values['models_list']
+        current_image_path=values['predict_image']
+        
+        if (len(current_model_name)==0 or len(current_image_path)==0):
+            sg.popup('you have to select a model and an image!!')
+        else:
+            window['image'].update(data=helper.get_img_data_tkinter(current_image_path, first=True))
+            current_model_path=os.path.join('models',current_model_name+'.pth')
+            current_model=torch.load(current_model_path)
+            current_model.eval()
+            current_image=helper.image_loader(current_image_path)
+             ##################################################### threading for prediction
+            t3=ThreadWithReturnValue(target=current_model,args=(current_image,))
+            t3.start()
+            logps=t3.join()               
+            probs=torch.exp(logps)
+            top_p, top_class = probs.topk(1, dim=1)
+            pred_index=top_class.item()
+            probability=top_p.item()
+            probability=round(probability,4)
+            # read the classes csv
+            class_labels=[]
+            with open(os.path.join('labels',current_model_name +'.csv'),newline='' ) as cfile:
+                rlist=csv.reader(cfile)
+                for row in rlist:
+                    class_labels.append(row)
+            class_labels=class_labels[0]
+            window[GUI.predict_out].update('\n'+str(probability*100)+'%   '+class_labels[pred_index]+
+                                            '.', text_color_for_value='green',background_color_for_value='white',
+                                            font=('Helvetica',30),append=False)
+
+    if event=='predict_folder':
+        folder = values["predict_folder"]
+        try:
+            # Get list of files in folder
+            file_list = os.listdir(folder)
+        except:
+            file_list = []
+
+        fnames = [
+            f
+            for f in file_list
+            if os.path.isfile(os.path.join(folder, f))
+            
+        ]
+        window["images_list"].update(fnames)
+        
+    if event=='images_list':
+        try:
+            current_image_path=os.path.join(values['predict_folder'],values['images_list'][0])
+            window['image'].update(data=helper.get_img_data_tkinter(current_image_path, first=True))
+
+        except:
+            pass
+        
+        ################################################################### the prediction code
+        current_model_name= values['models_list']
         ccurrent_image_path=os.path.join(values['predict_folder'],values['images_list'][0])
 
         window['image'].update(data=helper.get_img_data_tkinter(current_image_path, first=True))
@@ -120,6 +176,7 @@ while True:
             top_p, top_class = probs.topk(1, dim=1)
             pred_index=top_class.item()
             probability=top_p.item()
+            probability=round(probability,4)
             # read the classes csv
             class_labels=[]
             with open(os.path.join('labels',current_model_name +'.csv'),newline='' ) as cfile:
@@ -127,32 +184,20 @@ while True:
                 for row in rlist:
                     class_labels.append(row)
             class_labels=class_labels[0]
-            window[GUI.predict_out].update('\n this is '+class_labels[pred_index] + ' with probability of ' + str(probability*100)+'.', text_color_for_value='green',background_color_for_value='white',append=True)
-    
-    if event=='predict_folder':
-        folder = values["predict_folder"]
-        try:
-            # Get list of files in folder
-            file_list = os.listdir(folder)
-        except:
-            file_list = []
+            window[GUI.predict_out].update('\n'+str(probability*100)+'%   '+class_labels[pred_index]+
+                                            '.', text_color_for_value='green',background_color_for_value='white',
+                                            font=('Helvetica',30),append=False)
+            ########################################################################################################## end of prediction
+        
 
-        fnames = [
-            f
-            for f in file_list
-            if os.path.isfile(os.path.join(folder, f))
-            
-        ]
-        window["images_list"].update(fnames)
-    if event=='images_list':
-        try:
-            current_image_path=os.path.join(values['predict_folder'],values['images_list'][0])
-            window['image'].update(data=helper.get_img_data_tkinter(current_image_path, first=True))
-
-        except:
-            pass
     if event=='About...':
-        sg.popup('Simple AI is a startup that develops an application for desktop. The application makes use of already available machine learning libraries like tensorflow and pytorch to make machine learning easy. AI is a field that is very applicable in the current world. However, making an implementable AI app takes an expert to go into the field and program it. This application makes it easy to implement any kind of AI algorithm easily. Using the app any person can train machine learning models easily without a deep knowledge of the field and no knowledge of programming. It is a very important app to implement AI solutions for companies. The application is on development stage and it will be released for trial soon.')
+        sg.popup('Simple AI is a startup that develops an application for desktop. The application makes use of already\
+             available machine learning libraries like tensorflow and pytorch to make machine learning easy. AI is a field \
+                 that is very applicable in the current world. However, making an implementable AI app takes an expert to \
+                 go into the field and program it. This application makes it easy to implement any kind of AI algorithm easily.\
+                      Using the app any person can train machine learning models easily without a deep knowledge of the field \
+                          and no knowledge of programming. It is a very important app to implement AI solutions for companies.\
+                               The application is on development stage and it will be released for trial soon.')
 
     if event=='documentation':
         webbrowser.open_new(r'docs\doc.pdf')

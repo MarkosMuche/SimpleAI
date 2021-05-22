@@ -48,6 +48,7 @@ def get_img_data_tkinter(f, maxsize=(1200, 850), first=False):
     """Generate image data using PIL
     """
     img = Image.open(f)
+    img=img.resize((300,200))
     img.thumbnail(maxsize)
     if first:                     # tkinter is inactive the first time
         bio = io.BytesIO()
