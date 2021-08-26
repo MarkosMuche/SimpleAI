@@ -34,7 +34,7 @@ while True:
         window['col4'].update(visible=toggle)
         window['col5'].update(visible=toggle)
         window['col6'].update(visible=toggle)
-        toggle= not toggle
+        # toggle= not toggle
 
     if event== 'train':
         transfer_model=values['transfer_models']
@@ -49,7 +49,10 @@ while True:
             sg.popup('You have to input the training folder, the testing folder as well as the model!!!')
         else:
             classes=os.listdir(DATADIR_train)
+            classes.sort()
+            print(classes)
             num_classes=len(classes)
+            print('debug :',num_classes)
             ####################################################################################################create model
             ############################################################################### thread 1 to create the model
             t1=ThreadWithReturnValue(target=helper.initialize_model,args=(transfer_model,num_classes,learning_rate ))
@@ -78,6 +81,7 @@ while True:
         try:
             DATADIR_train=values['train_folder']
             folder=os.listdir(DATADIR_train)
+            folder.sort()
             random.shuffle(folder)
             folder1=os.path.join(DATADIR_train,folder[0])
             folder2=os.path.join(DATADIR_train,folder[1])
@@ -113,7 +117,7 @@ while True:
             current_model.eval()
             current_image=helper.image_loader(current_image_path)
              ##################################################### threading for prediction
-            t3=ThreadWithReturnValue(target=current_model,args=(current_image,))
+            t3=ThreadWithReturnValue(target=MachineLearn.predict,args=(current_image,current_model))
             t3.start()
             logps=t3.join()               
             probs=torch.exp(logps)
@@ -137,6 +141,7 @@ while True:
         try:
             # Get list of files in folder
             file_list = os.listdir(folder)
+            file_list.sort()
         except:
             file_list = []
 
@@ -144,10 +149,8 @@ while True:
             f
             for f in file_list
             if os.path.isfile(os.path.join(folder, f))
-            
         ]
         window["images_list"].update(fnames)
-        
     if event=='images_list':
         try:
             current_image_path=os.path.join(values['predict_folder'],values['images_list'][0])
@@ -155,7 +158,6 @@ while True:
 
         except:
             pass
-        
         ################################################################### the prediction code
         current_model_name= values['models_list']
         ccurrent_image_path=os.path.join(values['predict_folder'],values['images_list'][0])
@@ -200,6 +202,6 @@ while True:
                                The application is on development stage and it will be released for trial soon.')
 
     if event=='documentation':
-        webbrowser.open_new(r'docs\doc.pdf')
+        webbrowser.open_new(r'docs/doc.pdf')
 
 window.close()

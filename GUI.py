@@ -6,6 +6,7 @@ import helper
 from PySimpleGUI.PySimpleGUI import Input, VSeparator
 ####################################################################### read files from the models folder
 models_list_pth=os.listdir('models')
+models_list_pth.sort()
 models_list=[]
 
 predict_out = 'predict_ml'+sg.WRITE_ONLY_KEY ### keys for multilines
@@ -26,9 +27,9 @@ def make_gui():
     # create one tab for learning task
     layout_learn_1=[
                     [sg.Text('Sample Images from the training folder')],
-                    [sg.Image(key='train_image1',data=helper.get_img_data_tkinter('logos\SAI_logo1.jpg', first=True))],
-                    [sg.Image(key='train_image2',data=helper.get_img_data_tkinter('logos\SAI_logo2.png', first=True))],
-                    [sg.Image(key='train_image3',data=helper.get_img_data_tkinter('logos\SAI_logo1.jpg', first=True))]
+                    [sg.Image(key='train_image1',data=helper.get_img_data_tkinter('logos/SAI_logo1.jpg', first=True))],
+                    [sg.Image(key='train_image2',data=helper.get_img_data_tkinter('logos/SAI_logo1.jpg', first=True))],
+                    [sg.Image(key='train_image3',data=helper.get_img_data_tkinter('logos/SAI_logo1.jpg', first=True))]
     ]
     layout_learn_2 = [ menu,
                     [sg.Button('Advanced settings')],
