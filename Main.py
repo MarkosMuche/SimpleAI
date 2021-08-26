@@ -50,9 +50,7 @@ while True:
         else:
             classes=os.listdir(DATADIR_train)
             classes.sort()
-            print(classes)
             num_classes=len(classes)
-            print('debug :',num_classes)
             ####################################################################################################create model
             ############################################################################### thread 1 to create the model
             t1=ThreadWithReturnValue(target=helper.initialize_model,args=(transfer_model,num_classes,learning_rate ))
